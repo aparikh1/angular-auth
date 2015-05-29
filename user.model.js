@@ -9,6 +9,7 @@ var saltBuffer = crypto.randomBytes(16),
 var userSchema = mongoose.Schema({
 	username: String,
 	hashedPassword: String,
+	role: String,
 	salt: { type: String, default: function () { return salt }}
 });
 

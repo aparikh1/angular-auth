@@ -4,11 +4,11 @@ var express = require('express'),
 	bodyParser = require('body-parser');
 	fs = require('fs');
 	https = require('https');
-
+	session = require('express-session')
+	cookieParser = require('cookie-parser')
+	flash = require('connect-flash')
 
 var app = express();
-
-var session = require('express-session')
 
 app.set('views', __dirname + '/pages');
 app.set('view engine', 'html');
@@ -43,6 +43,7 @@ app.use(function (req, res, next) {
     console.log('counter', ++req.session.counter);
     next();
 });
+
 
 
 app.use(require('./routes'));

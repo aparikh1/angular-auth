@@ -1,5 +1,6 @@
 var router = require('express').Router();
 var crypto = require('crypto')
+var flash = require('connect-flash')
 
 var User = require('./user.model.js');
 
@@ -29,7 +30,12 @@ router.post('/login', function (req, res, next) {
 		var dbPassword = crypto.pbkdf2Sync(req.body.password, user.salt, 0, 64).toString('base64');
 
 		if(dbPassword === user.hashedPassword) {
+			if (req.body.role) {
+				req.session.admin = req.body.role;
+			}
+
 			req.session.userId = req.body.username;
+			req.session.cookie.maxAge = 60000;
 			res.render('success');
 		}
 		else if(err) next(err);
@@ -38,6 +44,16 @@ router.post('/login', function (req, res, next) {
 });
 
 router.get('/membersOnly', isAuthenticated);
+
+router.get('/adminsOnly', isAuthenticated);
+
+function isAdmin (req, res, next) {
+	if (req.session.admin) {
+		res.render('secret');
+	} else {
+		next(401);
+	}
+}
 
 function isAuthenticated (req, res, next) {
 	if (req.session.userId) {
