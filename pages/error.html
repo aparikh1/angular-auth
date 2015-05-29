@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<a href="/">Go home</a>
+<div>
+	<img src="http://media.giphy.com/media/nLIiW6wj9WnSM/giphy.gif"/>
+</div>
+<div style="color:red;">
+	<h4>{{ error.message }}</h4>
+	<h5>{{ error.status }}</h5>
+	<pre>{{ error.stack }}</pre>
+</div>
+{% endblock %}
