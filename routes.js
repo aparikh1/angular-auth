@@ -1,4 +1,5 @@
 var router = require('express').Router();
+var crypto = require('crypto')
 
 var User = require('./user.model.js');
 
@@ -11,6 +12,7 @@ router.get('/signup', function (req, res) {
 });
 
 router.post('/signup', function (req, res, next) {
+
 	User.create(req.body, function (err, user) {
 		if (err) next(err);
 		else res.redirect('/success');
@@ -22,10 +24,16 @@ router.get('/login', function (req, res) {
 });
 
 router.post('/login', function (req, res, next) {
-	User.findOne(req.body, function (err, user) {
-		if (err) next(err);
-		else if (!user) res.redirect('/failure');
-		else res.redirect('/success');
+	console.log('body', req.body);
+
+	User.findOne({ username: req.body.username }, function (err, user) {
+		var dbPassword = crypto.pbkdf2Sync(req.body.password, user.salt, 0, 64).toString('base64');
+
+		if(dbPassword === user.hashedPassword) {
+			res.redirect('/success');
+		}
+		else if(err) next(err);
+		else { res.redirect('/failure');}
 	});
 });
 

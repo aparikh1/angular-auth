@@ -2,16 +2,11 @@ var express = require('express'),
 	swig = require('swig'),
 	logger = require('morgan'),
 	bodyParser = require('body-parser');
+	fs = require('fs');
+	https = require('https');
+	
 
 var app = express();
-
-var https = require('https');
-var fs = require('fs');
-
-var options = {
-  key: fs.readFileSync('./key.pem'),
-  cert: fs.readFileSync('./cert.pem')
-};
 
 app.set('views', __dirname + '/pages');
 app.set('view engine', 'html');
@@ -35,12 +30,20 @@ app.use(function (err, req, res, next) {
 	res.render('error', {error: err});
 });
 
-// var port = 1337;
-// app.listen(port, function () {
+var port = 1337;
+app.listen(port, function () {
+	console.log('Server ready on port', port);
+});
+
+var options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
+// console.log(options.key.toString());
+// console.log(options.cert.toString());
+
+
+// https.createServer(options, app).listen(1337, function () {
 // 	console.log('Server ready on port', port);
 // });
-
-// console.log(options);
-
-
-https.createServer(options, app).listen(1337);
