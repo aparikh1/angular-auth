@@ -24,25 +24,41 @@ router.get('/login', function (req, res) {
 });
 
 router.post('/login', function (req, res, next) {
-	console.log('body', req.body);
 
 	User.findOne({ username: req.body.username }, function (err, user) {
 		var dbPassword = crypto.pbkdf2Sync(req.body.password, user.salt, 0, 64).toString('base64');
 
 		if(dbPassword === user.hashedPassword) {
-			res.redirect('/success');
+			req.session.userId = req.body.username;
+			res.render('success');
 		}
 		else if(err) next(err);
 		else { res.redirect('/failure');}
 	});
 });
 
-router.get('/membersOnly', function (req, res, next) {
-	res.render('secret');
-});
+router.get('/membersOnly', isAuthenticated);
+
+function isAuthenticated (req, res, next) {
+	if (req.session.userId) {
+		res.render('secret');
+	} else {
+		next(401);
+	}
+}
+
 
 router.get('/success', function (req, res) {
 	res.render('success');
+});
+
+router.get('/logout', function (req, res) {
+	req.session.userId = null;
+
+	req.session.destroy(function(err) {
+		if(err) next(err);
+	})
+	res.redirect('/');
 });
 
 router.get('/failure', function (req, res, next) {
